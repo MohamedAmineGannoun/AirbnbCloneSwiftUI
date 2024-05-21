@@ -20,20 +20,43 @@ struct SearchDestinationView: View {
     @State private var destination : String = ""
     
     @State private var selectedOption : DestinationSearchOption = .location
+    @State private var startDate = Date()
+    @State private var endDate = Date()
+    @State private var guests : Int = 0
     
     var body: some View {
         VStack(alignment: .leading) {
             
-            Button(action: {
-                withAnimation(.snappy){
-                    show.toggle()
+            HStack {
+                Button(action: {
+                    withAnimation(.snappy){
+                        show.toggle()
+                    }
+                }, label: {
+                    Image(systemName: "xmark.circle")
+                        .imageScale(.large)
+                        .foregroundStyle(.black)
+                })
+                
+                Spacer()
+                
+                if !destination.isEmpty {
+                    
+                    Button(action: {
+                        destination = ""
+                    }, label: {
+                        Text("Clear")
+                            .foregroundStyle(.black)
+                            .font(.subheadline)
+                            .fontWeight(.semibold)
+                    })
+                    
                 }
-            }, label: {
-                Image(systemName: "xmark.circle")
-                    .imageScale(.large)
-                    .foregroundStyle(.black)
-                    .padding()
-            })
+                
+            }.padding()
+            
+            
+            
             VStack {
                 
                 if selectedOption == .location {
@@ -80,9 +103,25 @@ struct SearchDestinationView: View {
             
             
             // Dates selection
-            VStack {
+            VStack(alignment: .leading) {
                 
                 if selectedOption == .dates {
+                    
+                    Text("When's your trip?")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    
+                    VStack {
+                        DatePicker("From", selection: $startDate, displayedComponents: .date)
+                            .onTapGesture(count: 99) {}
+                        Divider()
+                        DatePicker("To", selection: $endDate, displayedComponents: .date)
+                            .onTapGesture(count: 99) {}
+                    }
+                    .foregroundStyle(.gray)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    
                     
                 }else{
                     CollapsedPickerView(title: "When", description: "Add dates")
@@ -90,7 +129,7 @@ struct SearchDestinationView: View {
                 
             }
             .padding()
-            .frame(height: selectedOption == .dates ? 120 : 64)
+            .frame(height: selectedOption == .dates ? 180 : 64)
             .background(.white)
             .clipShape(RoundedRectangle(cornerRadius: 12))
             .padding()
@@ -105,7 +144,19 @@ struct SearchDestinationView: View {
             // Number Guests
             VStack {
                 
-                if selectedOption == .dates {
+                if selectedOption == .guests {
+                    
+                    Text("Who's coming?")
+                    
+                    Stepper{
+                        Text("\(guests) adults")
+                    } onIncrement: {
+                        guests += 1
+                    } onDecrement: {
+                        if guests > 0 {
+                            guests -= 1
+                        }
+                    }
                     
                 }else{
                     CollapsedPickerView(title: "Who", description: "Add guests")
@@ -124,6 +175,9 @@ struct SearchDestinationView: View {
             }
             
         }
+        
+        Spacer()
+        
     }
 }
 
